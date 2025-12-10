@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mileage Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(to bottom right, #eff6ff, #e0e7ff);
+            min-height: 100vh;
+            padding: 1rem;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .header h1 {
+            font-size: 1.875rem;
+            font-weight: bold;
+            color: #1f2937;
+        }
+        
+        .icon {
+            font-size: 2rem;
+        }
+        
+        .error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        button {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1rem;
+        }
+        
+        .btn-start {
+            background: #16a34a;
+            color: white;
+        }
+        
+        .btn-start:hover {
+            background: #15803d;
+        }
+        
+        .btn-end {
+            background: #dc2626;
+            color: white;
+        }
+        
+        .btn-end:hover {
+            background: #b91c1c;
+        }
+        
+        .btn-copy {
+            background: #4f46e5;
+            color: white;
+        }
+        
+        .btn-copy:hover {
+            background: #4338ca;
+        }
+        
+        .btn-delete {
+            background: transparent;
+            color: #dc2626;
+            padding: 0.5rem;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+        
+        .btn-delete:hover {
+            color: #991b1b;
+        }
+        
+        .tracking-status {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .tracking-status p {
+            font-size: 0.875rem;
+            color: #1e40af;
+            margin-top: 0.25rem;
+        }
+        
+        .tracking-status strong {
+            font-weight: 600;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .section-header h2 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1f2937;
+        }
+        
+        .empty-state {
+            text-align: center;
+            color: #6b7280;
+            padding: 2rem 0;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        thead tr {
+            border-bottom: 2px solid #e5e7eb;
+        }
+        
+        th {
+            text-align: left;
+            padding: 0.75rem 0.5rem;
+            font-weight: 600;
+            color: #374151;
+        }
+        
+        th.text-right {
+            text-align: right;
+        }
+        
+        tbody tr {
+            border-bottom: 1px solid #f3f4f6;
+        }
+        
+        tbody tr:hover {
+            background: #f9fafb;
+        }
+        
+        td {
+            padding: 0.75rem 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        td.text-right {
+            text-align: right;
+        }
+        
+        .total-section {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .total-section p {
+            text-align: right;
+            font-size: 1.125rem;
+            font-weight: bold;
+            color: #1f2937;
+        }
+        
+        .note {
+            background: #fef3c7;
+            border: 1px solid #fde68a;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .note p {
+            font-size: 0.875rem;
+            color: #92400e;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <span class="icon">📍</span>
+                <h1>Mileage Tracker</h1>
+            </div>
+
+            <div id="error" class="error hidden"></div>
+
+            <div class="button-group">
+                <button id="startBtn" class="btn-start">
+                    ▶️ Start Trip
+                </button>
+                <button id="endBtn" class="btn-end hidden">
+                    ⏹️ End Trip
+                </button>
+            </div>
+
+            <div id="trackingStatus" class="tracking-status hidden">
+                <p style="font-weight: 600; color: #1e40af; margin-bottom: 0.5rem;">🚗 Trip in Progress</p>
+                <p id="startLocationText"></p>
+                <p id="currentDistanceText"></p>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="section-header">
+                <h2>Trip History</h2>
+                <button id="copyBtn" class="btn-copy hidden">
+                    📋 Copy for Sheets
+                </button>
+            </div>
+
+            <div id="emptyState" class="empty-state">
+                No trips recorded yet. Start your first trip!
+            </div>
+
+            <div id="tripTable" class="hidden">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Start Location</th>
+                                <th>End Location</th>
+                                <th class="text-right">Distance</th>
+                                <th class="text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tripTableBody"></tbody>
+                    </table>
+                </div>
+                <div class="total-section">
+                    <p id="totalDistance">Total Distance: 0.00 miles</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="note">
+            <p><strong>Note:</strong> Keep this browser tab open during your trip for accurate tracking. Location names are retrieved automatically using OpenStreetMap.</p>
+        </div>
+    </div>
+
+    <script>
+        let isTracking = false;
+        let startLocation = null;
+        let currentLocation = null;
+        let trips = [];
+        let watchId = null;
+
+        const elements = {
+            error: document.getElementById('error'),
+            startBtn: document.getElementById('startBtn'),
+            endBtn: document.getElementById('endBtn'),
+            trackingStatus: document.getElementById('trackingStatus'),
+            startLocationText: document.getElementById('startLocationText'),
+            currentDistanceText: document.getElementById('currentDistanceText'),
+            emptyState: document.getElementById('emptyState'),
+            tripTable: document.getElementById('tripTable'),
+            tripTableBody: document.getElementById('tripTableBody'),
+            copyBtn: document.getElementById('copyBtn'),
+            totalDistance: document.getElementById('totalDistance')
+        };
+
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 3959;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = 
+                Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return (R * c).toFixed(2);
+        }
+
+        async function getLocationName(lat, lon) {
+            try {
+                // Try OpenStreetMap first
+                const response = await fetch(
+                    `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`,
+                    {
+                        headers: {
+                            'User-Agent': 'MileageTracker/1.0'
+                        }
+                    }
+                );
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.address) {
+                        // Format a nice address
+                        const parts = [];
+                        if (data.address.house_number && data.address.road) {
+                            parts.push(`${data.address.house_number} ${data.address.road}`);
+                        } else if (data.address.road) {
+                            parts.push(data.address.road);
+                        }
+                        if (data.address.city || data.address.town || data.address.village) {
+                            parts.push(data.address.city || data.address.town || data.address.village);
+                        }
+                        if (data.address.state) {
+                            parts.push(data.address.state);
+                        }
+                        
+                        if (parts.length > 0) {
+                            return parts.join(', ');
+                        }
+                        
+                        return data.display_name;
+                    }
+                }
+                
+                // Fallback to coordinates with Google Maps link
+                return `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
+            } catch (err) {
+                // Fallback to coordinates
+                return `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
+            }
+        }
+
+        function showError(message) {
+            elements.error.textContent = message;
+            elements.error.classList.remove('hidden');
+        }
+
+        function hideError() {
+            elements.error.classList.add('hidden');
+        }
+
+        async function startTrip() {
+            hideError();
+            
+            if (!navigator.geolocation) {
+                showError('Geolocation is not supported by your browser');
+                return;
+            }
+            
+            watchId = navigator.geolocation.watchPosition(
+                async (position) => {
+                    const location = {
+                        lat: position.coords.latitude,
+                        lon: position.coords.longitude,
+                        timestamp: new Date()
+                    };
+                    
+                    if (!startLocation) {
+                        location.name = await getLocationName(location.lat, location.lon);
+                        startLocation = location;
+                        elements.startLocationText.innerHTML = `<strong>Started at:</strong> ${location.name}`;
+                    }
+                    currentLocation = location;
+                    
+                    if (startLocation && currentLocation) {
+                        const distance = calculateDistance(
+                            startLocation.lat,
+                            startLocation.lon,
+                            currentLocation.lat,
+                            currentLocation.lon
+                        );
+                        elements.currentDistanceText.innerHTML = `<strong>Current distance:</strong> ${distance} miles`;
+                    }
+                },
+                (err) => {
+                    showError(`Error getting location: ${err.message}`);
+                },
+                {
+                    enableHighAccuracy: true,
+                    maximumAge: 0,
+                    timeout: 5000
+                }
+            );
+            
+            isTracking = true;
+            elements.startBtn.classList.add('hidden');
+            elements.endBtn.classList.remove('hidden');
+            elements.trackingStatus.classList.remove('hidden');
+        }
+
+        async function endTrip() {
+            if (watchId) {
+                navigator.geolocation.clearWatch(watchId);
+            }
+            
+            if (startLocation && currentLocation) {
+                const endLocationName = await getLocationName(
+                    currentLocation.lat,
+                    currentLocation.lon
+                );
+                
+                const distance = calculateDistance(
+                    startLocation.lat,
+                    startLocation.lon,
+                    currentLocation.lat,
+                    currentLocation.lon
+                );
+                
+                const newTrip = {
+                    id: Date.now(),
+                    date: new Date().toLocaleDateString(),
+                    time: new Date().toLocaleTimeString(),
+                    startLocation: startLocation.name,
+                    endLocation: endLocationName,
+                    distance: distance
+                };
+                
+                trips.unshift(newTrip);
+                renderTrips();
+            }
+            
+            isTracking = false;
+            startLocation = null;
+            currentLocation = null;
+            watchId = null;
+            
+            elements.startBtn.classList.remove('hidden');
+            elements.endBtn.classList.add('hidden');
+            elements.trackingStatus.classList.add('hidden');
+        }
+
+        function renderTrips() {
+            if (trips.length === 0) {
+                elements.emptyState.classList.remove('hidden');
+                elements.tripTable.classList.add('hidden');
+                elements.copyBtn.classList.add('hidden');
+                return;
+            }
+            
+            elements.emptyState.classList.add('hidden');
+            elements.tripTable.classList.remove('hidden');
+            elements.copyBtn.classList.remove('hidden');
+            
+            elements.tripTableBody.innerHTML = trips.map(trip => `
+                <tr>
+                    <td>${trip.date}</td>
+                    <td>${trip.time}</td>
+                    <td>${trip.startLocation}</td>
+                    <td>${trip.endLocation}</td>
+                    <td class="text-right" style="font-weight: 600;">${trip.distance} mi</td>
+                    <td class="text-right">
+                        <button class="btn-delete" onclick="deleteTrip(${trip.id})" title="Delete trip">
+                            🗑️
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+            
+            const total = trips.reduce((sum, trip) => sum + parseFloat(trip.distance), 0).toFixed(2);
+            elements.totalDistance.textContent = `Total Distance: ${total} miles`;
+        }
+
+        function deleteTrip(id) {
+            trips = trips.filter(trip => trip.id !== id);
+            renderTrips();
+        }
+
+        function copyToClipboard() {
+            const headers = 'Date\tTime\tStart Location\tEnd Location\tDistance (miles)\n';
+            const rows = trips.map(trip => 
+                `${trip.date}\t${trip.time}\t${trip.startLocation}\t${trip.endLocation}\t${trip.distance}`
+            ).join('\n');
+            
+            navigator.clipboard.writeText(headers + rows).then(() => {
+                alert('Trip data copied! You can now paste it into Google Sheets.');
+            });
+        }
+
+        elements.startBtn.addEventListener('click', startTrip);
+        elements.endBtn.addEventListener('click', endTrip);
+        elements.copyBtn.addEventListener('click', copyToClipboard);
+    </script>
+</body>
+</html>
